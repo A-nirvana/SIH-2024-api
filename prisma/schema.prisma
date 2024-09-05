@@ -20,3 +20,11 @@ model User {
   firstName String
   lastName String
 }
+
+
+model Otp {
+  id        String   @id @default(uuid())
+  email     String
+  otp       String
+  createdAt DateTime @default(now())
+}
