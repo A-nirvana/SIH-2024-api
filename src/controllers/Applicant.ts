@@ -3,6 +3,10 @@ import zod, { string } from 'zod'
 import cors from 'cors'
 import prisma from '../../prisma/prismaClient';
 import {sign} from 'jsonwebtoken'
+import { AuthMiddleware } from '../middlewares/AuthMiddleware'; 
+import cloudinary from 'cloudinary'
+import { upload } from '../middlewares/MulterMiddleware';
+
 
 const signupSchema = zod.object({
     username : zod.string().email(),
@@ -73,3 +77,23 @@ export const ApplicantSignup = async(req : Request ,res : Response)=>{
         })
     }
 }
+
+
+// how to upload on cloudinary
+
+// app.post('/upload', upload.single('image'), (req,res)=>{
+//     cloudinary.v2.uploader.upload(req.file.path , (err , result)=>{
+//         if(err){
+//             console.log(err)
+//             return res.status(500).json({
+//                 success : false,
+//                 message : "error"
+//             })
+//         }
+//         res.status(200).json({
+//             success : true,
+//             message : "uploaded" ,
+//             data : result
+//         })
+//     })
+// })
