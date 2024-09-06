@@ -9,15 +9,15 @@ export async function AuthMiddleware ( req : Request | any, res : Response, next
   const token_with_bearer  =  req.header('Authorization') || ""
   const token = token_with_bearer.split(" ")[1]
   if(!token){
-    return res.status(400).json({
+    return res.status(401).json({
         message  : "No authorization found"
     })
   }
   try {
     const payload = await jwt.verify(token,JWT_SECRET) as JwtPayload
-    const {username} = payload as any;
+    const {id} = payload as any;
     
-    if(username){
+    if(!id){
       return res.status(401).json({
         message : 'token invalid'
       })
@@ -26,15 +26,15 @@ export async function AuthMiddleware ( req : Request | any, res : Response, next
     try {
       const user = await prisma.user.findUnique({
         where : {
-          username : username
+          id : id
         }
       })
       
       if(user){
-        req.user.username = user.username
+        req.user = user
         await next()
       }else{
-        return res.status(400).json({
+        return res.status(401).json({
           message : "you are not authorized"
         })
       }
@@ -47,7 +47,7 @@ export async function AuthMiddleware ( req : Request | any, res : Response, next
 
 
   } catch (err) {
-    return res.status(500).json({
+    return res.status(503).json({
       message  : "something is up....please wait for sometime"
     })
   }
