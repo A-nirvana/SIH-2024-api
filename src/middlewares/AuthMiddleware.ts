@@ -15,9 +15,9 @@ export async function AuthMiddleware ( req : Request | any, res : Response, next
   }
   try {
     const payload = await jwt.verify(token,JWT_SECRET) as JwtPayload
-    const {username} = payload as any;
+    const { id } = payload as any;
     
-    if(username){
+    if(!id){
       return res.status(401).json({
         message : 'token invalid'
       })
@@ -26,12 +26,12 @@ export async function AuthMiddleware ( req : Request | any, res : Response, next
     try {
       const user = await prisma.user.findUnique({
         where : {
-          username : username
+          id : id
         }
       })
       
       if(user){
-        req.user.username = user.username
+        req.user = user
         await next()
       }else{
         return res.status(400).json({
@@ -44,8 +44,6 @@ export async function AuthMiddleware ( req : Request | any, res : Response, next
         message : "something is up with the database..please try again later"
       })
     }
-
-
   } catch (err) {
     return res.status(500).json({
       message  : "something is up....please wait for sometime"
