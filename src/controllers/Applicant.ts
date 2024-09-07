@@ -1,11 +1,8 @@
 import express, { Application, Request, Response } from 'express';
 import zod, { string } from 'zod'
-import cors from 'cors'
 import prisma from '../../prisma/prismaClient';
 import {sign} from 'jsonwebtoken'
-import { AuthMiddleware } from '../middlewares/AuthMiddleware'; 
-import cloudinary from 'cloudinary'
-import { upload } from '../middlewares/MulterMiddleware';
+const JWT_SECRET = process.env.JWT_SECRET
 
 
 const signupSchema = zod.object({
