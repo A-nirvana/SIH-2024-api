@@ -6,14 +6,15 @@ const JWT_SECRET = process.env.JWT_SECRET
 
 
 const signupSchema = zod.object({
-    username : zod.string().email(),
+    email : zod.string().email(),
+    phone : zod.string().min(9),
     password : zod.string().min(6),
     firstName  : zod.string().min(1),
     lastName : zod.string().min(1)
 })
 
 const signinBodySchema = zod.object({
-    username : zod.string().email(),
+    email : zod.string().email(),
     password : zod.string().min(6)
 }) 
 
@@ -22,7 +23,7 @@ export const ApplicantSignin = async(req : Request , res : Response)=>{
     const response = signinBodySchema.safeParse(signinBody)
     const userInDatabase = await prisma.user.findUnique({
         where : {
-            username : signinBody.username,
+            email : signinBody.email,
             password : signinBody.password
         }
     })
@@ -45,17 +46,18 @@ export const ApplicantSignup = async(req : Request ,res : Response)=>{
     try {
         const existingUser = await prisma.user.findFirst({
             where : {
-                username : signupBody.username
+                email : signupBody.email
             }
         })
         if( !response.success || existingUser){
             return res.status(403).json({
-                "message" : "incorrect credentials/ username already in use"
+                "message" : "incorrect credentials/ email already in use"
             })
         }
         const user = await prisma.user.create({
             data : {
-                username : signupBody.username,
+                email : signupBody.email,
+                phone : signupBody.phone,
                 password : signupBody.password,
                 firstName : signupBody.firstName,
                 lastName : signupBody.lastName
