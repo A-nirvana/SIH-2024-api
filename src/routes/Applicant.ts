@@ -5,8 +5,8 @@ import { sendOtp, verifyOtp } from "../utils/Otp";
 
 const router = express.Router();
 
-router.post("/apply/sendotp",sendOtp);
+router.post("/sendotp",sendOtp);
 router.post("/signup" ,verifyOtp, CheckEmail, ApplicantSignup);
-router.post("/signin",verifyOtp, ApplicantSignin);
+router.post("/signin", ApplicantSignin);
 
 export default router;

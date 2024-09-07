@@ -1,10 +1,11 @@
 import { Request, Response,NextFunction } from "express";
 import sendEmail from "./SendEmail";
 import prisma from "../../prisma/prismaClient";
+import sendSMSOTP from "./PhoneVerify";
 
 export const sendOtp = async (req: Request, res: Response) => {
   try {
-    const { email } = req.body;
+    const { email, phone } = req.body;
     let otp = Math.floor(100000 + Math.random() * 900000).toString();
     console.log(`OTP for ${email} is ${otp}`);
     const otpPrev= await prisma.otp.deleteMany({
@@ -24,6 +25,7 @@ export const sendOtp = async (req: Request, res: Response) => {
       return;
     }
     sendEmail(email, "OTP for verification", `Your OTP is ${otp}. It will expire in 5 minutes.`,"");
+    sendSMSOTP(phone, otp);
     res.status(200).json({ message: "OTP sent successfully" });
     setTimeout(async () => {
       const otpData = await prisma.otp.findFirst({
