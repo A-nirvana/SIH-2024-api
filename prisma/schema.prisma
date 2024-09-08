@@ -29,8 +29,8 @@ model Otp {
 
 
 model Funds{
-  id Int @id @default(autoincrement())
-  funds BigInt
+  id        Int     @id @default(1)
+  funds     BigInt  @default(99999999999)
 }
 
 
@@ -44,12 +44,12 @@ model Admin{
 }
 
 model Documents{
-  id                  Int            @id                      @default(autoincrement())
-  incomeCertificate   Status         @default(notSubmitted)
-  pwdCertificate      Status         @default(notSubmitted)
-  casteCertificate    Status         @default(notSubmitted)
-  collegeId           Status         @default(notSubmitted)
-  applicantId         Int
+  id                  Int            @id    @unique                   @default(autoincrement())
+  incomeCertificate   Status?        @default(notSubmitted)
+  pwdCertificate      Status?        @default(notSubmitted)
+  casteCertificate    Status?        @default(notSubmitted)
+  instituteId         Status         @default(notSubmitted)
+  applicantId         Int            @unique
   applicant           Applicant      @relation(fields: [applicantId], references: [id])
 }
 
@@ -59,4 +59,5 @@ enum Status{
   verified
   notVerified
   rejected
+  notRequired
 }

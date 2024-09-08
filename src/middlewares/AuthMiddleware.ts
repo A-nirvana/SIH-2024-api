@@ -24,14 +24,14 @@ export async function AuthMiddleware ( req : Request | any, res : Response, next
     }
     
     try {
-      const user = await prisma.user.findUnique({
+      const applicant = await prisma.applicant.findUnique({
         where : {
           id : id
         }
       })
       
-      if(user){
-        req.user = user
+      if(applicant){
+        req.applicant = applicant
         await next()
       }else{
         return res.status(401).json({

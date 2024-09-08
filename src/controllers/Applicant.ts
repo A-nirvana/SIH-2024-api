@@ -21,18 +21,18 @@ const signinBodySchema = zod.object({
 export const ApplicantSignin = async(req : Request , res : Response)=>{
     const signinBody = req.body
     const response = signinBodySchema.safeParse(signinBody)
-    const userInDatabase = await prisma.user.findUnique({
+    const applicantInDatabase = await prisma.applicant.findUnique({
         where : {
             email : signinBody.email,
             password : signinBody.password
         }
     })
-    if(!userInDatabase || !response.success){
+    if(!applicantInDatabase || !response.success){
         res.json({
-            message : "user does not exists / incorrect inputs"
+            message : "applicant does not exists / incorrect inputs"
         }) 
     }else{
-        var token = await sign({id : userInDatabase.id},JWT_SECRET as string)
+        var token = await sign({id : applicantInDatabase.id},JWT_SECRET as string)
         return res.json({
             message : "you are logged in",
             token : token
@@ -44,17 +44,19 @@ export const ApplicantSignup = async(req : Request ,res : Response)=>{
     const signupBody = req.body
     const response = signupSchema.safeParse(signupBody)
     try {
-        const existingUser = await prisma.user.findFirst({
+        const existingApplicant = await prisma.applicant.findFirst({
             where : {
                 email : signupBody.email
             }
         })
-        if( !response.success || existingUser){
+ 
+
+        if( !response.success || existingApplicant){
             return res.status(403).json({
                 "message" : "incorrect credentials/ email already in use"
             })
         }
-        const user = await prisma.user.create({
+        const user = await prisma.applicant.create({
             data : {
                 email : signupBody.email,
                 phone : signupBody.phone,
@@ -96,3 +98,5 @@ export const ApplicantSignup = async(req : Request ,res : Response)=>{
 //         })
 //     })
 // })
+
+
