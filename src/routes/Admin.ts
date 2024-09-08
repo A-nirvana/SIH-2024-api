@@ -1,4 +1,4 @@
-import { AdminSignin,AdminSignup,AdminDocumentStatus,AdminDocumentVerification,AdminTransaction,AdminApplicants  } from "../controllers";
+import { AdminSignin,AdminSignup,AdminDocumentStatus,AdminDocumentVerification,AdminTransaction,AdminApplicantSearchBar  } from "../controllers";
 import express from "express";
 import CheckEmail from "../middlewares/CheckEmail";
 import { sendOtp, verifyOtp } from "../utils/Otp";
@@ -12,5 +12,5 @@ router.post("/signin", AdminSignin);
 router.post('/document_status',AuthMiddleware,AdminDocumentStatus)
 router.get('/document_verification',AuthMiddleware,AdminDocumentVerification)
 router.post('/transaction',AuthMiddleware,AdminTransaction)
-router.get('/applicants',AuthMiddleware,AdminApplicants)
+router.get('/applicants',AuthMiddleware,AdminApplicantSearchBar)
 export default router;
