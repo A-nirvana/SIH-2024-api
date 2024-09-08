@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Applicant {
-  id Int @id @default(autoincrement())
+  id Int @id @default(autoincrement()) @unique
   phone String @unique
   email String @unique
   password String
@@ -17,6 +17,7 @@ model Applicant {
   lastName String
   fundsReceived Boolean @default(false)
   documents Documents[]
+  bankDetails BankDetails[]
 }
 
 
@@ -44,7 +45,7 @@ model Admin{
 }
 
 model Documents{
-  id                  Int            @id    @unique                   @default(autoincrement())
+  id                  Int            @id                       @default(autoincrement())
   incomeCertificate   Status?        @default(notSubmitted)
   pwdCertificate      Status?        @default(notSubmitted)
   casteCertificate    Status?        @default(notSubmitted)
@@ -60,4 +61,15 @@ enum Status{
   notVerified
   rejected
   notRequired
+}
+
+
+model BankDetails{
+    id           Int            @id                       @default(autoincrement()) 
+    IFSC         String
+    BRANCH_NAME  String
+    ACCOUNT_NO   String
+    amount       Int
+    applicantId  Int            @unique
+    applicant    Applicant      @relation(fields : [applicantId] , references: [id])
 }

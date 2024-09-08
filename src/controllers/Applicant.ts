@@ -62,7 +62,7 @@ export const ApplicantSignup = async(req : Request ,res : Response)=>{
                 phone : signupBody.phone,
                 password : signupBody.password,
                 firstName : signupBody.firstName,
-                lastName : signupBody.lastName
+                lastName : signupBody.lastName,
             }
         })
         var token = await sign({id : user.id},JWT_SECRET as string)

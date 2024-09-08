@@ -153,4 +153,138 @@ export const AdminDocumentVerification = async (req : Request ,res : Response)=>
     }
 }
 
+export const AdminTransaction = async(req : Request ,res : Response)=>{
+    const {applicantId,amount} = req.body
 
+    try {
+        const prevAmount = await prisma.bankDetails.findFirst({
+            where : {
+                applicantId : applicantId
+            }
+        })
+        
+        const prevFunds = await prisma.funds.findFirst({
+            where : {
+                id : 1
+            }
+        })
+        
+        
+        if(prevAmount){
+            const add =  prisma.bankDetails.update({
+                where : {
+                    applicantId : applicantId
+                },
+                data : {
+                        amount : prevAmount?.amount + amount
+                }
+            })
+    
+            const subtract =  prisma.funds.update({
+                where : {
+                    id : 1
+                },
+                data : {
+                    funds : (prevFunds?.funds as bigint - amount)
+                }
+            })
+
+            const statusUpdate = prisma.applicant.update({
+                where : {
+                    id : applicantId
+                },
+                data : {
+                    fundsReceived : true
+                }
+            })
+            const response = await prisma.$transaction([add,subtract,statusUpdate])
+
+            if(response){
+                return res.status(200).json({
+                    message : "transaction successfull"
+                })
+            }else{
+                return res.status(501).json({
+                    message : "transaction unsuccessfull"
+                })
+            }
+
+        }else{
+            res.status(404).json({
+                message : "bank account not found"
+            })
+        }
+
+    } catch (err) {
+        res.status(500).json({
+            message : "something is up with the database....please wait for sometime"
+        })
+    }    
+}
+
+
+export const AdminApplicants = async(req : Request ,res : Response)=>{
+    try {
+        const applicants = await prisma.applicant.findMany({})
+        return res.status(200).json({
+            applicants : applicants
+        })
+    } catch (err) {
+        res.status(500).json({
+            message : "something is up with the database...please wait for sometime"
+        })
+    }
+}
+
+export const AdminApplicantSearchBar = async(req : Request ,res : Response)=>{
+    //body will consists of applicant id
+    try {
+        const searchedApplicant = await prisma.applicant.findFirst({
+            where : {
+                id : req.body.id
+            }
+        })
+
+        const searchedApplicantbankDetails = await prisma.bankDetails.findFirst({
+            where : {
+                applicantId : req.body.id
+            }
+        })
+        
+        const searchedApplicantdocuments = await prisma.documents.findFirst({
+            where : {
+                applicantId : req.body.id
+            }
+        })
+        
+        if(searchedApplicant){
+            return res.status(200).json({
+            id : searchedApplicant.id,
+            phone : searchedApplicant.phone,
+            email : searchedApplicant.email,
+            firstName : searchedApplicant.firstName,
+            lastName : searchedApplicant.lastName,
+            fundsReceived : searchedApplicant.fundsReceived,
+            bankDetails : {
+                IFSC : searchedApplicantbankDetails?.IFSC,
+                BRANCH_NAME : searchedApplicantbankDetails?.BRANCH_NAME,
+                ACCOUNT_NAME : searchedApplicantbankDetails?.ACCOUNT_NO
+            },
+            documents : {
+                incomeCertificate : searchedApplicantdocuments?.incomeCertificate,
+                pwd : searchedApplicantdocuments?.pwdCertificate,
+                casteCertificate : searchedApplicantdocuments?.casteCertificate,
+                instituteId : searchedApplicantdocuments?.instituteId,
+            }
+        })
+    }else{
+        return res.status(200).json({
+            message : "no applicant found"
+        })
+    }
+    } catch (err) {
+        res.status(500).json({
+            message : "something is up with the database...please wait for sometime"
+        })
+    }
+}
