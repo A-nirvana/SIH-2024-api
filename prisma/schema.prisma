@@ -8,13 +8,15 @@ datasource db {
   url      = env("DATABASE_URL")  
 }
 
-model User {
+model Applicant {
   id Int @id @default(autoincrement())
   phone String @unique
   email String @unique
   password String
   firstName String
   lastName String
+  fundsReceived Boolean @default(false)
+  documents Documents[]
 }
 
 
@@ -23,4 +25,38 @@ model Otp {
   email     String
   otp       String
   createdAt DateTime @default(now())
+}
+
+
+model Funds{
+  id Int @id @default(autoincrement())
+  funds BigInt
+}
+
+
+model Admin{
+  id          Int     @id     @default(autoincrement())
+  phone       String  @unique
+  email       String  @unique
+  password    String
+  firstName   String
+  lastName    String
+}
+
+model Documents{
+  id                  Int            @id                      @default(autoincrement())
+  incomeCertificate   Status         @default(notSubmitted)
+  pwdCertificate      Status         @default(notSubmitted)
+  casteCertificate    Status         @default(notSubmitted)
+  collegeId           Status         @default(notSubmitted)
+  applicantId         Int
+  applicant           Applicant      @relation(fields: [applicantId], references: [id])
+}
+
+enum Status{
+  submitted
+  notSubmitted
+  verified
+  notVerified
+  rejected
 }
